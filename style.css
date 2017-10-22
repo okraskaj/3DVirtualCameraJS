@@ -16,8 +16,11 @@ canvas {
 h1{
      font-size: 50pt;
 }
-h1, ul, li, p, h3, h2{
+span, ul, li, p, h3, h2, h1{
     font-family: Arial;
+}
+span{
+    color: darkgray;
 }
 
 .center {

@@ -49,33 +49,27 @@ window.onload = function(){
         // Distance between the camera and the plane
         //var d = 200;
         var r = d / M.y;
-
         return new Vertex2D(r * M.x, r * M.z);
     }
 
     function render(objects, context, dx, dy, zoomFactor) {
-        // Clear the previous frame
         context.clearRect(0, 0, 2*dx, 2*dy);
 
-        // For each object
         for (var i = 0, n_obj = objects.length; i < n_obj; ++i) {
-            // For each face
             for (var j = 0, n_faces = objects[i].faces.length; j < n_faces; ++j) {
-                // Current face
                 var face = objects[i].faces[j];
 
-                // Draw the first vertex
+                // Draw only the first vertex
                 var P = project(face[0], zoomFactor);
                 context.beginPath();
                 context.moveTo(P.x + dx, -P.y + dy);
 
-                // Draw the other vertices
+                // Draw the rest
                 for (var k = 1, n_vertices = face.length; k < n_vertices; ++k) {
                     P = project(face[k], zoomFactor);
                     context.lineTo(P.x + dx, -P.y + dy);
                 }
-
-                // Close the path and draw the face
+                // Drawing
                 context.closePath();
                 context.stroke();
                 context.fill();
@@ -84,14 +78,11 @@ window.onload = function(){
     }
 
     (function() {
-        // Fix the canvas width and height
         var canvas = document.getElementById('canvas');
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
         var dx = canvas.width / 2;
         var dy = canvas.height / 2;
-
-        // Objects style
         var context = canvas.getContext('2d');
         context.strokeStyle = 'rgba(0, 0, 0, 0.4)';
         context.fillStyle = 'rgba(150, 150, 255, 0.5)';
@@ -116,33 +107,41 @@ window.onload = function(){
         var backstreetCuboid = new Cuboid(back, 800, 10, 600);
 
 
-        var objects = [backstreetCuboid, rightClosestCuboid, leftClosestCuboid, rightMiddleCuboid, leftMiddleCuboid, rightFarthestCuboid, leftFarthestCuboid, street];
+        var objects = [backstreetCuboid,
+            leftFarthestCuboid,
+            rightFarthestCuboid,
+            rightMiddleCuboid,
+            leftMiddleCuboid,
+            rightClosestCuboid,
+            leftClosestCuboid,
+            street];
         var zoomFactor = 200;
 
         render(objects, context, dx, dy, zoomFactor);
 
 
         document.onkeydown = function(evt){
+            // uncomment line bellow to find out other keycodes
 //                alert(evt.keyCode)
             switch(event.keyCode)
             {
                 case 65://d - right
-                    move(new Vertex(10, 0 , 0));
+                    moveAll(new Vertex(10, 0 , 0));
                     break;
                 case 68:// a - left
-                    move(new Vertex(-10, 0 , 0));
+                    moveAll(new Vertex(-10, 0 , 0));
                     break;
                 case 83:// w - up
-                    move(new Vertex(0, 0 , 10));
+                    moveAll(new Vertex(0, 0 , 10));
                     break;
                 case 87: // s - down
-                    move(new Vertex(0, 0 , -10));
+                    moveAll(new Vertex(0, 0 , -10));
                     break;
                 case 70: // f - front
-                    move(new Vertex(0, -10 , 0));
+                    moveAll(new Vertex(0, -10 , 0));
                     break;
                 case 66: // b - back
-                    move(new Vertex(0, 10 , 0));
+                    moveAll(new Vertex(0, 10 , 0));
                     break;
                 case 219: // [  = zoom out
                     zoomFactor -= 5;
@@ -150,9 +149,8 @@ window.onload = function(){
                 case 221: // ] = zoom in
                     zoomFactor += 5;
                     break;
-
             }
-
+            // refresh after each event
             render(objects, context, dx, dy, zoomFactor);
         }
 
@@ -162,7 +160,7 @@ window.onload = function(){
             object.z+= vector.z;
         }
 
-        var move = function(vec){
+        var moveAll = function(vec){
             for(var i = 0; i< objects.length; i++)
             {
                 translate(objects[i].centerPoint, vec);
